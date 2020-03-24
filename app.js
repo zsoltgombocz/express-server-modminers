@@ -15,13 +15,20 @@ app.use(authRoute)
 
 
 app.get('/', (req,res) => {
-    res.send("We are on home! Video 10.32")
+    res.send("Az API jelenleg teszt fázisban van.")
 })
 
 app.use('/posts', postsRoute)
 
 const port = process.env.PORT || 3000
 //Connect to DB
-mongoose.connect(process.env.DB_CONNECTION,{ useNewUrlParser: true , useUnifiedTopology: true}, () => console.log("Connected to DB!"))
+try {
+    mongoose.connect(process.env.DB_CONNECTION,{ useNewUrlParser: true , useUnifiedTopology: true}, () => console.log("[MongoDB]: Csatlakozva az adatbázishoz!"));
+}catch (error){
+    console.log("[MongoDB csatlakozás]:"+error);
+}
+mongoose.connection.on('error', err => {
+    console.log("[MongoDB hiba]:"+err);
+});
 
-app.listen(port, () => console.log(`Server is running and listening on port ${port}...`));
+app.listen(port, () => console.log(`[Szerver]: A szerver a ${port}-es porton fut...`));
