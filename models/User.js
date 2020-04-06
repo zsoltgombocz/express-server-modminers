@@ -20,6 +20,12 @@ const UserSchema = mongoose.Schema({
         minlength: 11,
         maxlength: 64
     },
+    description: {
+        type: String,
+        require: true,
+        minlength: 20,
+        maxlength: 5000
+    },
     permissions: {
         verified: {type: Boolean, default: false, require:true},
         admin: {type: Boolean, default: false, require:true},
@@ -36,6 +42,6 @@ const UserSchema = mongoose.Schema({
         require: true
     }
 
-});
+}, { retainKeyOrder: true });
 
 module.exports = mongoose.model("User", UserSchema);
