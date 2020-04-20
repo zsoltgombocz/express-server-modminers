@@ -3,9 +3,10 @@ const router = express.Router();
 const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const {loginValidation, registerValidation, emailValidation} = require('../validation')
+const { logger } = require('../services/logger')
+
 
 router.post('/register', async (req,res) => {
-
     const {error} = registerValidation(req.body);
     if(error){
         let msg = ""
