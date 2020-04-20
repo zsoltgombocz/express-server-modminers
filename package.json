@@ -4,7 +4,9 @@
   "description": "NodeJS Server",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "devStart": "nodemon app.js",
+    "prodStart": "pm2 start app.js --watch",
+    "stop": "pm2 stop app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Miraglia00",
@@ -18,6 +20,7 @@
     "express": "^4.17.1",
     "mongoose": "^5.9.5",
     "morgan": "^1.10.0",
+    "pm2": "^4.3.1",
     "randomstring": "^1.1.5",
     "uuid": "^7.0.2"
   },

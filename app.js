@@ -23,4 +23,4 @@ app.use('/user', userRoute)
 
 const port = process.env.PORT || 3000
 
-app.listen(port, () => console.log(`[Szerver]: A szerver a ${port}-es porton fut...`));
+app.listen(port, () => console.log(`[Szerver]: A szerver a ${port}-es porton fut...[${process.env.NODE_ENV || 'development'}]`));
