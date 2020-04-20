@@ -56,16 +56,9 @@ router.post('/login', async (req,res) => {
 
         const validPassword = await bcrypt.compare(req.body.password, loginUser.password);
 
-        if(!validPassword) return res.json({message: "Nem megfelelő név/jelszó párosítás!"});
+        if(!validPassword) return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
 
         res.json({message: "Sikeres belépés", user: loginUser})
-        /*
-        try{
-            const savedUser = await user.save();
-            res.send(savedUser)
-        }catch(err) {
-            res.status(400).send(err);
-        }*/
     }
 })
 

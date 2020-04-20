@@ -1,5 +1,6 @@
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 
 require('./database/db.js')
@@ -11,6 +12,7 @@ const userRoute = require('./routes/user')
 
 //MIDDLEWARE
 app.use(bodyParser.json())
+app.use(cors())
 
 app.use('/posts', authRoute, postsRoute)
 
