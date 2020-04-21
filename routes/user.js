@@ -8,7 +8,7 @@ const { logger } = require('../services/logger')
 
 router.post('/register', async (req,res) => {
     const {error} = registerValidation(req.body);
-    let msg = {}
+    let msg = {};
     if(error){
         error.details.forEach(e => {
             msg[e.path] = e.message;
@@ -24,24 +24,23 @@ router.post('/register', async (req,res) => {
         
         const validemail = await emailValidation(req.body.email)
         if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
+        if(Object.keys(msg).length != 0) {
+            return res.status(400).json(msg);
+        }else{
+            const hashedpass = await bcrypt.hash(req.body.password, 10);
 
-        if(msg != null) {
-            return res.status(400).json(msg)
-        }
-
-        const hashedpass = await bcrypt.hash(req.body.password, 10);
-
-        const user = new userModel({
-            username: req.body.username,
-            email: req.body.email,
-            description: req.body.description,
-            password: hashedpass
-        });
-        try{
-            const savedUser = await user.save();
-            res.json({message: "Regisztráció sikeresen megtörtént!", u_id: savedUser._id})
-        }catch(err) {
-            res.status(400).send(err);
+            const user = new userModel({
+                username: req.body.username,
+                email: req.body.email,
+                description: req.body.description,
+                password: hashedpass
+            });
+            try{
+                const savedUser = await user.save();
+                res.json({message: "Regisztráció sikeresen megtörtént!"})
+            }catch(err) {
+                res.status(500).send(err);
+            }
         }
     }
 })
@@ -63,7 +62,7 @@ router.post('/login', async (req,res) => {
 
         if(!validPassword) msg["password"] =  "Nem megfelelő név/jelszó párosítás!"; //return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
 
-        if(msg != null) {
+        if(Object.keys(msg).length != 0) {
             return res.status(400).json(msg)
         }else{
             res.json({message: "Sikeres belépés", user: {"token":"Kéne"}})
