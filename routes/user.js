@@ -23,8 +23,9 @@ router.post('/register', async (req,res) => {
         if(emailExist) msg["email"] ="Az email foglalt!"; //return res.status(400).json({message:"Az email foglalt!"})
         
         
-        const validemail = await emailValidation(req.body.email)
+        const validemail = emailValidation(req.body.email)
         if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
+        
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba a regisztráció során!\n[LOG]Kapott adat:'+JSON.stringify(req.body)+'\n[LOG]Kapott hiba:' + JSON.stringify(msg))
             return res.status(400).json(msg);
@@ -41,7 +42,7 @@ router.post('/register', async (req,res) => {
                 const savedUser = await user.save();
                 res.json({message: "Regisztráció sikeresen megtörtént!"})
             }catch(err) {
-                res.status(500).send(err);
+                res.status(500).json({message: "Hiba történt a regisztráció során!", error: err});
             }
         }
     }
