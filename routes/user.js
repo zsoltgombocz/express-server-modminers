@@ -3,7 +3,7 @@ const router = express.Router();
 const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const {loginValidation, registerValidation, emailValidation} = require('../validation')
-const { logger } = require('../services/logger')
+const morgan = require('morgan')
 
 
 router.post('/register', async (req,res) => {
@@ -13,6 +13,7 @@ router.post('/register', async (req,res) => {
         error.details.forEach(e => {
             msg[e.path] = e.message;
         });
+        console.log('[LOG] Hiba a regisztráció során!\n[LOG]Kapott adat:'+JSON.stringify(req.body)+'\n[LOG]Kapott hiba:' + JSON.stringify(msg))
         return res.status(400).send(msg)
     }else{
         const usernameExist = await userModel.findOne({username: req.body.username})
@@ -25,6 +26,7 @@ router.post('/register', async (req,res) => {
         const validemail = await emailValidation(req.body.email)
         if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
         if(Object.keys(msg).length != 0) {
+            console.log('[LOG] Hiba a regisztráció során!\n[LOG]Kapott adat:'+JSON.stringify(req.body)+'\n[LOG]Kapott hiba:' + JSON.stringify(msg))
             return res.status(400).json(msg);
         }else{
             const hashedpass = await bcrypt.hash(req.body.password, 10);
@@ -52,7 +54,7 @@ router.post('/login', async (req,res) => {
     if(error){
         error.details.forEach(e => {
             msg[e.path] = e.message;
-        });
+        });console.log('[LOG] Hiba a belépés során!\n[LOG]Kapott adat:'+JSON.stringify(req.body)+'\n[LOG]Kapott hiba:' + JSON.stringify(msg))
         return res.status(400).send(msg)
     }else{
         const loginUser = await userModel.findOne({username:req.body.username});
@@ -63,9 +65,10 @@ router.post('/login', async (req,res) => {
         if(!validPassword) msg["password"] =  "Nem megfelelő név/jelszó párosítás!"; //return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
 
         if(Object.keys(msg).length != 0) {
+            console.log('[LOG] Hiba a belépés során!\n[LOG]Kapott adat:'+JSON.stringify(req.body)+'\n[LOG]Kapott hiba:' + JSON.stringify(msg))
             return res.status(400).json(msg)
         }else{
-            res.json({message: "Sikeres belépés", user: {"token":"Kéne"}})
+            res.json({message: "Sikeres belépés", user: {token:"Kéne"}})
         }
     }
 })

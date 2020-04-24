@@ -15,7 +15,7 @@ const userRoute = require('./routes/user')
 //MIDDLEWARE
 app.use(bodyParser.json())
 app.use(cors())
-app.use(morgan('[LOG] :remote-addr - :remote-user [:date[web]]: ":method :url HTTP/:http-version" Status: :status :res[content-length] ":referrer" ":user-agent" Header: [:res[header]][:res[header]]"'))
+app.use(morgan('[AUTO-LOG] :remote-addr - :remote-user [:date[web]]: ":method :url HTTP/:http-version" Status: :status :res[content-length] ":referrer" ":user-agent" Header: [:res[header]][:res[header]]"'))
 
 app.use('/posts', authRoute, postsRoute)
 
@@ -23,4 +23,4 @@ app.use('/user', userRoute)
 
 const port = process.env.PORT || 3000
 
-app.listen(port, () => console.log(`[Szerver]: A szerver a ${port}-es porton fut...[${process.env.NODE_ENV || 'development'}]`));
+app.listen(port, () => console.log(`[Szerver]: A szerver a ${port}-es porton fut...`));
