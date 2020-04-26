@@ -61,15 +61,20 @@ router.post('/login', async (req,res) => {
         const loginUser = await userModel.findOne({username:req.body.username});
         if(!loginUser)  msg["username"] =  "A felhasználónév nem létezik!"; //return res.json({message: "A felhasználónév nem létezik!"});
 
+        console.log(loginUser)
         const validPassword = await bcrypt.compare(req.body.password, loginUser.password);
-
+        
         if(!validPassword) msg["password"] =  "Nem megfelelő név/jelszó párosítás!"; //return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
 
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
             return res.status(400).json(msg)
         }else{
-            res.json({message: "Sikeres belépés", user: {token:"Kéne"}})
+            if(!loginUser.permissions.verified) {
+                console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({notverified: "A felhasználófiók nincs megerősítve, kérlek használd az e-mail címdre kiküldött linket!"}))
+                return res.status(400).json({notverified: "A felhasználófiók nincs megerősítve, kérlek használd az e-mail címdre kiküldött linket!"})
+            }
+            return res.json({message: "Sikeres belépés", user: {token:"Kéne"}})
         }
     }
 })

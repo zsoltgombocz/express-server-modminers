@@ -19,15 +19,9 @@ const registerValidation = data => {
 }
 
 const loginValidation = data => {
-    const schema = joi.object({
-        username: joi.string().min(6).required().messages({
-            "string.base": `"username" should be a type of 'text'`,
-            "string.empty": `"username" cannot be an empty field444444`,
-            "string.min": `"username" should have a minimum length of {#limit}`,
-            "string.max": `"username" should have a maximum length of {#limit}`,
-            "any.required": `"username" is a required field`
-          }),
-        password: joi.string().min(6).required()
+    const schema = joi.object().keys({
+        username: joi.string().min(6).required().messages(message),
+        password: joi.string().min(6).required().messages(message)
     });
     return schema.validate(data, {abortEarly: false});
 }
