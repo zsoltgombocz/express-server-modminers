@@ -22,6 +22,10 @@ app.use(morgan('[AUTO-LOG] :remote-addr - :remote-user [:date[web]]: ":method :u
 app.use('/posts', authRoute, postsRoute)
 app.use('/user', userRoute)
 
+app.get('/wakeup', (req,res) => {
+    res.send("Ébren!")
+})
+
 //ErrorHandler-Middlewares
 app.use(notFound);
 app.use(errorHandler);
