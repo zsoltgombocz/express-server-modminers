@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router();
 const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
+const authroute = require('../routes/auth')
+const nodemailer = require('nodemailer')
 const {loginValidation, registerValidation, emailValidation} = require('../validation')
 
 
@@ -61,7 +63,6 @@ router.post('/login', async (req,res) => {
         const loginUser = await userModel.findOne({username:req.body.username});
         if(!loginUser)  msg["username"] =  "A felhasználónév nem létezik!"; //return res.json({message: "A felhasználónév nem létezik!"});
 
-        console.log(loginUser)
         const validPassword = await bcrypt.compare(req.body.password, loginUser.password);
         
         if(!validPassword) msg["password"] =  "Nem megfelelő név/jelszó párosítás!"; //return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
@@ -77,6 +78,9 @@ router.post('/login', async (req,res) => {
             return res.json({message: "Sikeres belépés", user: {token:"Kéne"}})
         }
     }
+})
+router.post('/sendemail', /*authroute*/ async (req, res) => {
+    
 })
 
 

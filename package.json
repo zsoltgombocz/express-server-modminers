@@ -23,6 +23,7 @@
     "localize-joi": "^1.3.1",
     "mongoose": "^5.9.5",
     "morgan": "^1.10.0",
+    "nodemailer": "^6.4.6",
     "pm2": "^4.3.1",
     "randomstring": "^1.1.5",
     "request": "^2.88.2",

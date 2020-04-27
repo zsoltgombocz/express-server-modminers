@@ -18,6 +18,21 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+router.post('/', async (req, res, next) => {
+
+    const key = req.headers['authorization'];
+
+    if(key != undefined) {
+        if(await validateKey(key)) {
+            next();
+        }else{
+            res.status(401).json({'message':'Unauthorized'});
+        }
+    }else{
+        res.status(401).json({'message':'Unauthorized'});
+    }
+});
+
 router.get('/create', async (req, res, next) => {
     if(await validateKey(req.headers['authorization'])) {
         const newKey = await createKey();
