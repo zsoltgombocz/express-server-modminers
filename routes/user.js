@@ -4,6 +4,7 @@ const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const authroute = require('../routes/auth')
 const nodemailer = require('nodemailer')
+const email = require('../services/email')
 const {loginValidation, registerValidation, emailValidation} = require('../validation')
 
 
@@ -80,7 +81,8 @@ router.post('/login', async (req,res) => {
     }
 })
 router.post('/sendemail', /*authroute*/ async (req, res) => {
-    
+    const sendEmail = email.send('zsolt.gombocz00@gmail.com', 'ÚjEmail');
+    res.send(sendEmail)
 })
 
 
