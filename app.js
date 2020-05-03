@@ -21,6 +21,7 @@ app.use(morgan('[AUTO-LOG] :remote-addr - :remote-user [:date[web]]: ":method :u
 //Routes
 app.use('/posts', authRoute, postsRoute)
 app.use('/user', userRoute)
+app.use('/auth', authRoute)
 
 app.get('/wakeup', (req,res) => {
     res.send("Ébren!")

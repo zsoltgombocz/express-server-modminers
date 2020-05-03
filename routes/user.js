@@ -3,9 +3,10 @@ const router = express.Router();
 const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const authroute = require('../routes/auth')
-const nodemailer = require('nodemailer')
 const email = require('../services/email')
 const {loginValidation, registerValidation, emailValidation} = require('../validation')
+
+router.use('/sendemail', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -41,8 +42,8 @@ router.post('/register', async (req,res) => {
                 password: hashedpass
             });
             try{
-                const savedUser = await user.save();
-                res.json({message: "Regisztráció sikeresen megtörtént!"})
+                //await user.save();
+                res.status(200).json({message: "Regisztráció sikeresen megtörtént!"})
             }catch(err) {
                 res.status(500).json({message: "Hiba történt a regisztráció során!", error: err});
             }
@@ -80,8 +81,8 @@ router.post('/login', async (req,res) => {
         }
     }
 })
-router.post('/sendemail', /*authroute*/ async (req, res) => {
-    const sendEmail = email.send('zsolt.gombocz00@gmail.com', 'ÚjEmail');
+router.post('/sendemail', async (req, res) => {
+    const sendEmail = email.send('zsolt.gombocz00@gmail.com', 'verifyUser', {username: "Miraglia"});
     res.send(sendEmail)
 })
 

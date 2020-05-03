@@ -4,6 +4,10 @@ const KeysSchema = mongoose.Schema({
     key: {
         type: String,
         require: true
+    },
+    permanent: {
+        type: Boolean,
+        default: true
     }
 });
 

@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer')
-const hbs = require('nodemailer-express-handlebars')
-function send(to, subject, variant = null, payload = null) {
+const Email = require('email-templates')
+
+function send(to, template, payload = null) {
     if(!process.env.GMAIL_ADDR || !process.env.GMAIL_PASS) 
     return ({message: "Környezeti változók nincsenek beállítva."})
     
@@ -18,29 +19,29 @@ function send(to, subject, variant = null, payload = null) {
     }
     });
 
-    transporter.use('compile', hbs({
-        viewEngine: {
-            extName: '.hbs',
-            partialsDir: 'services/email_templates'
+    const email = new Email({
+        views: { root:'./services/templates', options: { extension: 'ejs' } },
+        message: {
+          from: process.env.GMAIL_ADDR,	
         },
-        viewPath: 'services/email_templates',
-        extName: '.hbs'    
-    }));
+        preview: true,
+        send: true,
+        transport: transporter
+        //transport: {
+          //jsonTransport: true
+        //}
+        
+    });
 
-    let mailOptions = {
-        from: process.env.GMAIL_ADDR,
-        to: to,
-        subject: subject,
-        template: 'verifyUser',
-        context: {}
-    };
-    
-    transporter.sendMail(mailOptions, function (err, info) {
-        if(err)
-          console.log(err);
-        else
-        console.log(info);
-     });
+    email.send({
+    template: template,
+    message: {
+        to: to
+    },
+    locals: payload
+    })
+    .then(console.log("Email elküldve!"))
+    .catch(console.error);
 }
 
 module.exports.send = send;

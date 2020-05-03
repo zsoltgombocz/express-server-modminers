@@ -33,25 +33,39 @@ router.post('/', async (req, res, next) => {
     }
 });
 
-router.get('/create', async (req, res, next) => {
-    if(await validateKey(req.headers['authorization'])) {
-        const newKey = await createKey();
+router.get('/create', async (req, res) => {
+    if(req.headers.host === 'modminers.hu' || req.headers.host === 'localhost:8080' || req.headers.host === 'localhost:3000') {
+        const newKey = await createKey(req.body.key || null, false);
         res.json({'key': newKey});
     }else{
-        res.status(401).json({'message':'Unauthorized'});
+        if(await validateKey(req.headers['authorization'])) {
+            const newKey = await createKey();
+            res.json({'key': newKey});
+        }else{
+            res.status(401).json({'message':'Unauthorized', headers: req.headers.host});
+        }
     }
-
 });
 
 async function validateKey(key){
     let get;
     try {
-        const token = await bcrypt.hash(key, 10);
         get = await Keys_Model.find();
+        console.log(get)
         for (i = 0; i<get.length; i++) {
             const match = await bcrypt.compare(key, get[i].key)
+            console.log(match)
             if(match) {
-                return true;
+                if(get[i].permanent === false) {
+                    try{
+                        await Keys_Model.deleteOne({key: get[i].key});
+                        return true;
+                    }catch(err) {
+                        res.status(500).json({message: "Hiba történt!", error: err});
+                    }                  
+                }else{
+                    return true;
+                }
             }else{
                 continue;
             }
@@ -61,20 +75,24 @@ async function validateKey(key){
     }
 }
 
-async function createKey(){
-    const key = await rstring.generate();
+async function createKey(key=null, perm=false){
+    if(key == null) { 
+        key = rstring.generate(); 
+    }
     const token = await bcrypt.hash(key, 10);
     const keyPost = Keys_Model({
-        key: token 
+        key: token,
+        permanent: perm
     });
     try {
-        const post = await keyPost.save();
+        await keyPost.save();
         return key;
 
     } catch (error) {
         console.log(error)
     }
 }
+
 
 
 
