@@ -5,7 +5,7 @@ const app = express();
 const {notFound, errorHandler} = require('./middlewares')
 const morgan = require('morgan')
 
-
+ 
 //Import Database connection file
 require('./database/db.js')
 
