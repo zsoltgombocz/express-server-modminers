@@ -22,7 +22,7 @@ router.post('/register', async (req,res) => {
         const usernameExist = await userModel.findOne({username: req.body.username})
         if(usernameExist) msg["username"] = "A felhasználónév foglalt!"; //return res.status(400).json({message: "A felhasználónév foglalt!"})
 
-        const emailExist = await userModel.findOne({email: req.body.email})
+        const emailExist = await userModel.findOne({'email.email': req.body.email})
         if(emailExist) msg["email"] ="Az email foglalt!"; //return res.status(400).json({message:"Az email foglalt!"})
         
         
@@ -37,13 +37,14 @@ router.post('/register', async (req,res) => {
 
             const user = new userModel({
                 username: req.body.username,
-                email: req.body.email,
+                'email.email': req.body.email,
+                'email.ver_code': await authroute.createKey(),
                 description: req.body.description,
                 password: hashedpass
             });
             try{
-                //await user.save();
-                email.send(req.body.email, 'verifyUser', {username: req.body.username})
+                await user.save();
+                //email.send(req.body.email, 'verifyUser', {username: req.body.username})
                 res.status(200).json({message: "Regisztráció sikeresen megtörtént!"})
             }catch(err) {
                 res.status(500).json({message: "Hiba történt a regisztráció során!", error: err});
@@ -74,9 +75,13 @@ router.post('/login', async (req,res) => {
             console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
             return res.status(400).json(msg)
         }else{
+            if(!loginUser.email.verified) {
+                console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({email_notverified: "Az e-mail cím nincs megerősítve."}))
+                return res.status(400).json({email_notverified: "Az e-mail cím nincs megerősítve."})
+            }
             if(!loginUser.permissions.verified) {
-                console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({notverified: "A felhasználófiók nincs megerősítve, kérlek használd az e-mail címdre kiküldött linket!"}))
-                return res.status(400).json({notverified: "A felhasználófiók nincs megerősítve, kérlek használd az e-mail címdre kiküldött linket!"})
+                console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."}))
+                return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."})
             }
             return res.json({message: "Sikeres belépés", user: {token:"Kéne"}})
         }
@@ -86,6 +91,31 @@ router.post('/sendemail', async (req, res) => {
     const sendEmail = email.send('zsolt.gombocz00@gmail.com', 'verifyUser', {username: "Miraglia"});
     res.send(sendEmail)
 })
+
+router.post('/verifyUser', async (req, res) => {
+    if(!req.query.username || !req.query.email || !req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés!'})
+
+    const payload = {
+        username: req.query.username,
+        'email.email': req.query.email,
+        'email.ver_code': req.query.key
+    }
+    try {
+        const user = await userModel.findOne(payload);
+        if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! (A megadott adatok helytelenek)'});
+
+        const validKey = await authroute.validateKey(req.query.key);
+
+        if(validKey) {
+            await user.updateOne({'email.verified': true, 'email.ver_code': ''})
+            res.status(200).json({message: 'Email aktiválása megtörtént!'})
+        }else{
+            return res.status(400).json({message: 'Nem megfelelő kérés! (A megadott kulcs helytelen)'});
+        }
+    } catch (error) {
+        return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
+    }
+});
 
 
 

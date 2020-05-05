@@ -51,10 +51,8 @@ async function validateKey(key){
     let get;
     try {
         get = await Keys_Model.find();
-        console.log(get)
         for (i = 0; i<get.length; i++) {
             const match = await bcrypt.compare(key, get[i].key)
-            console.log(match)
             if(match) {
                 if(get[i].permanent === false) {
                     try{
@@ -97,3 +95,5 @@ async function createKey(key=null, perm=false){
 
 
 module.exports = router;
+module.exports.validateKey = validateKey;
+module.exports.createKey = createKey;

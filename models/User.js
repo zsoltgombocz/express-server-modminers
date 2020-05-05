@@ -14,11 +14,14 @@ const UserSchema = mongoose.Schema({
         maxlength: 255
     },
     email: {
+        email: {
+            type: String,
+            require: true,
+            minlength: 11,
+            maxlength: 64
+        },
         verified: {type: Boolean, default: false},
-        type: String,
-        require: true,
-        minlength: 11,
-        maxlength: 64
+        ver_code: {type: String, default: ""},
     },
     description: {
         type: String,
