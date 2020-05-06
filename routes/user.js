@@ -108,7 +108,7 @@ router.post('/verifyUser', async (req, res) => {
 
         if(validKey) {
             await user.updateOne({'email.verified': true, 'email.ver_code': ''})
-            res.status(200).json({message: 'Email aktiválása megtörtént!'})
+            res.status(200).redirect(process.env.ROOT/+'user/email_verified');
         }else{
             return res.status(400).json({message: 'Nem megfelelő kérés! (A megadott kulcs helytelen)'});
         }

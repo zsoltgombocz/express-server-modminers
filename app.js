@@ -31,6 +31,20 @@ app.get('/wakeup', (req,res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+const variables = {
+    'ROOT': process.env.ROOT
+}
+
+const keys = Object.keys(variables);
+
+for (const key of keys) {
+    if(!variables[key]) {
+        console.log('[HIBA]: Egy vagy több környezeti változó nincs beállítva! A szerver leáll...');
+        console.log('[HIBA]: Változók: '+ keys)
+        process.exit(0);
+        break;
+    }
+  }
 const port = process.env.PORT || 3000
 
 app.listen(port, () => console.log(`[Szerver]: A szerver a ${port}-es porton fut...`));
