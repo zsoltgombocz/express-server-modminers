@@ -9,17 +9,18 @@ const variables = {
 
 const keys = Object.keys(variables);
 const notSet = [];
-
+let halt = false;
 for (const key of keys) {
     if(!variables[key]) {
         notSet.push(key);
+        halt = true;
         continue;
     }
 }
 
-if(notSet) {
+if(halt) {
     console.log('[HIBA]: Egy vagy több környezeti változó nincs beállítva! A szerver leáll...');
-    console.log('[HIBA]:Nem beállított változók: '+ notSet)
+    console.log('[HIBA]: Nem beállított változók: '+ notSet)
     process.exit(0);
 }else{
     return true;

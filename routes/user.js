@@ -92,13 +92,40 @@ router.post('/sendemail', async (req, res) => {
     res.send(sendEmail)
 })
 
-router.post('/verifyUser', async (req, res) => {
+router.post('/verifyEmail', async (req, res) => {
     if(!req.query.username || !req.query.email || !req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés!'})
 
     const payload = {
         username: req.query.username,
         'email.email': req.query.email,
-        'email.ver_code': req.query.key
+        'email.verfified': false
+    }
+    try {
+        const user = await userModel.findOne(payload);
+        if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Az e-mail cím már aktiválva van.'});
+
+        if(user.email.ver_code != req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező kulcs!'});
+
+        const validKey = await authroute.validateKey(req.query.key);
+
+        if(validKey) {
+            await user.updateOne({'email.verified': true, 'email.ver_code': ''})
+            return res.status(200).json({valid: true});
+        }else{
+            return res.status(400).json({message: 'Nem megfelelő kérés! A megadott kulcs helytelen'});
+        }
+    } catch (error) {
+        return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
+    }
+});
+
+router.post('/newPassword', async (req, res) => {
+    if(!req.query.username || !req.query.email || !req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés!'})
+
+    const payload = {
+        username: req.query.username,
+        'email.email': req.query.email,
+        password_code: req.query.key
     }
     try {
         const user = await userModel.findOne(payload);
@@ -107,8 +134,8 @@ router.post('/verifyUser', async (req, res) => {
         const validKey = await authroute.validateKey(req.query.key);
 
         if(validKey) {
-            await user.updateOne({'email.verified': true, 'email.ver_code': ''})
-            res.status(200).redirect(process.env.ROOT/+'user/email_verified');
+            await user.updateOne({password_code: ""})
+            return res.status(200).json({valid: true});
         }else{
             return res.status(400).json({message: 'Nem megfelelő kérés! (A megadott kulcs helytelen)'});
         }
@@ -116,7 +143,5 @@ router.post('/verifyUser', async (req, res) => {
         return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
     }
 });
-
-
 
 module.exports = router
