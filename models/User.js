@@ -8,6 +8,7 @@ const UserSchema = mongoose.Schema({
         maxlength: 64
     },
     password: {
+        request: {type: Boolean, require: true, default: false},
         type: String,
         require: true,
         minlength: 6,

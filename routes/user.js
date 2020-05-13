@@ -6,7 +6,7 @@ const authroute = require('../routes/auth')
 const email = require('../services/email')
 const {loginValidation, registerValidation, emailValidation} = require('../validation')
 
-router.use('/sendemail', authroute)
+//router.use('/sendemail', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -35,16 +35,18 @@ router.post('/register', async (req,res) => {
         }else{
             const hashedpass = await bcrypt.hash(req.body.password, 10);
 
+            const email_key = await authroute.createKey();
+
             const user = new userModel({
                 username: req.body.username,
                 'email.email': req.body.email,
-                'email.ver_code': await authroute.createKey(),
+                'email.ver_code': email_key,
                 description: req.body.description,
                 password: hashedpass
             });
             try{
                 await user.save();
-                //email.send(req.body.email, 'verifyUser', {username: req.body.username})
+                //await email.send(req.body.email, 'verifyUser', {username: req.body.username, verify: {root: process.ENV.ROOT, email: req.body.email, key: email_key}})
                 res.status(200).json({message: "Regisztráció sikeresen megtörtént!"})
             }catch(err) {
                 res.status(500).json({message: "Hiba történt a regisztráció során!", error: err});
@@ -88,7 +90,7 @@ router.post('/login', async (req,res) => {
     }
 })
 router.post('/sendemail', async (req, res) => {
-    const sendEmail = email.send('zsolt.gombocz00@gmail.com', 'verifyUser', {username: "Miraglia"});
+    const sendEmail = await email.send("zsolt.gombocz00@gmail.com", 'verifyUser', {username: "miraglia00", verify: {root: process.env.ROOT, email: "zsolt.gombocz00@gmail.com", key: 1234}})
     res.send(sendEmail)
 })
 
@@ -98,7 +100,7 @@ router.post('/verifyEmail', async (req, res) => {
     const payload = {
         username: req.query.username,
         'email.email': req.query.email,
-        'email.verfified': false
+        'email.verified': false
     }
     try {
         const user = await userModel.findOne(payload);
@@ -112,7 +114,7 @@ router.post('/verifyEmail', async (req, res) => {
             await user.updateOne({'email.verified': true, 'email.ver_code': ''})
             return res.status(200).json({valid: true});
         }else{
-            return res.status(400).json({message: 'Nem megfelelő kérés! A megadott kulcs helytelen'});
+            return res.status(400).json({message: 'Nem megfelelő kérés! A megadott kulcs helytelen.'});
         }
     } catch (error) {
         return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
@@ -125,19 +127,20 @@ router.post('/newPassword', async (req, res) => {
     const payload = {
         username: req.query.username,
         'email.email': req.query.email,
-        password_code: req.query.key
+        'password.request': true
     }
     try {
         const user = await userModel.findOne(payload);
-        if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! (A megadott adatok helytelenek)'});
+        if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Ehhez a fiókhoz nem kértek új jelszót!'});
+
+        if(user.password_code != req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező kulcs!'});
 
         const validKey = await authroute.validateKey(req.query.key);
 
         if(validKey) {
-            await user.updateOne({password_code: ""})
             return res.status(200).json({valid: true});
         }else{
-            return res.status(400).json({message: 'Nem megfelelő kérés! (A megadott kulcs helytelen)'});
+            return res.status(400).json({message: 'Nem megfelelő kérés! A megadott kulcs helytelen!'});
         }
     } catch (error) {
         return res.status(500).json({message: 'Váratlan hiba történt!', error: error});

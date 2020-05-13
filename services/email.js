@@ -14,7 +14,7 @@ oauth2Client.setCredentials({
 });
 const accessToken = oauth2Client.getAccessToken()
 
-function send(to, template, payload = null) {
+async function send(to, template, payload = null) {
     if(!process.env.GMAIL_ADDR || !process.env.OAuth_C_ID || !process.env.OAuth_C_S || !process.env.R_TOKEN) {
         return console.log("[HIBA] Környezeti változók nincsnek beállítva!")
     }
