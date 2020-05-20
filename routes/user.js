@@ -46,7 +46,7 @@ router.post('/register', async (req,res) => {
             });
             try{
                 await user.save();
-                //await email.send(req.body.email, 'verifyUser', {username: req.body.username, verify: {root: process.ENV.ROOT, email: req.body.email, key: email_key}})
+                await email.send(req.body.email, 'verifyUser', {username: req.body.username, verify: {root: process.env.ROOT, email: req.body.email, key: email_key}})
                 res.status(200).json({message: "Regisztráció sikeresen megtörtént!"})
             }catch(err) {
                 res.status(500).json({message: "Hiba történt a regisztráció során!", error: err});
@@ -90,8 +90,8 @@ router.post('/login', async (req,res) => {
     }
 })
 router.post('/sendemail', async (req, res) => {
-    const sendEmail = await email.send("zsolt.gombocz00@gmail.com", 'verifyUser', {username: "miraglia00", verify: {root: process.env.ROOT, email: "zsolt.gombocz00@gmail.com", key: 1234}})
-    res.send(sendEmail)
+    const emailSent = await email.send(req.body.email, 'verifyUser', {username: req.body.username, verify: {root: process.env.ROOT, email: req.body.email, key: 12354}})
+    res.send(emailSent)
 })
 
 router.post('/verifyEmail', async (req, res) => {

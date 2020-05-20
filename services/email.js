@@ -42,7 +42,7 @@ async function send(to, template, payload = null) {
         message: {
           from: process.env.GMAIL_ADDR,	
         },
-        preview: true,
+        preview: false,
         send: true,
         transport: transporter
         //transport: {
