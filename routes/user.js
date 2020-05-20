@@ -4,9 +4,9 @@ const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const authroute = require('../routes/auth')
 const email = require('../services/email')
-const {loginValidation, registerValidation, emailValidation} = require('../validation')
+const {loginValidation, registerValidation, emailValidation, sendEmailValidation} = require('../validation')
 
-//router.use('/sendemail', authroute)
+router.use('/sendemail', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -90,8 +90,39 @@ router.post('/login', async (req,res) => {
     }
 })
 router.post('/sendemail', async (req, res) => {
-    const emailSent = await email.send(req.body.email, 'verifyUser', {username: req.body.username, verify: {root: process.env.ROOT, email: req.body.email, key: 12354}})
-    res.send(emailSent)
+
+    const {error} = sendEmailValidation(req.body);
+    let msg = {};
+    if(error){
+        error.details.forEach(e => {
+            msg[e.path] = e.message;
+        });
+         console.log('[LOG] Hiba az email küldés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
+         return res.status(400).send(msg)
+    }else{
+        const usernameExist = await userModel.findOne({username: req.body.username, 'email.email': req.body.email})
+        if(!usernameExist) msg["email"] = "A felhasználónév / e-mail párosítás nem megfelelő!"; //return res.status(400).json({message: "A felhasználónév foglalt!"})
+
+        const validemail = emailValidation(req.body.email)
+        if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
+        
+
+        if(Object.keys(msg).length != 0) {
+            console.log('[LOG] Hiba az email küldés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
+            return res.status(400).json(msg);
+        }else{
+            let h_code = undefined;
+            if(req.body.h_key === "true") {
+                h_code = await authroute.createKey();
+            }
+            try{
+                await email.send(req.body.email, req.body.template, {username: req.body.username, verify: {root: process.env.ROOT, email: req.body.email, key: h_code}})
+                res.status(200).json({message: "E-mail elküldve!"})
+            }catch(err) {
+                res.status(500).json({message: "Hiba történt az email küldés során!", error: err});
+            }
+        }
+    }
 })
 
 router.post('/verifyEmail', async (req, res) => {

@@ -7,14 +7,18 @@ router.get('/', async (req, res, next) => {
 
     const key = req.headers['authorization'];
 
-    if(key != undefined) {
-        if(await validateKey(key)) {
-            next();
+    if(req.headers.host === 'modminers.hu' || req.headers.host === 'localhost:8080' || req.headers.host === 'localhost:3000') {
+        next();
+    }else{
+        if(key != undefined) {
+            if(await validateKey(key)) {
+                next();
+            }else{
+                res.status(401).json({'message':'Unauthorized'});
+            }
         }else{
             res.status(401).json({'message':'Unauthorized'});
         }
-    }else{
-        res.status(401).json({'message':'Unauthorized'});
     }
 });
 
@@ -22,14 +26,18 @@ router.post('/', async (req, res, next) => {
 
     const key = req.headers['authorization'];
 
-    if(key != undefined) {
-        if(await validateKey(key)) {
-            next();
+    if(req.headers.host === 'modminers.hu' || req.headers.host === 'localhost:8080' || req.headers.host === 'localhost:3000') {
+        next();
+    }else{
+        if(key != undefined) {
+            if(await validateKey(key)) {
+                next();
+            }else{
+                res.status(401).json({'message':'Unauthorized'});
+            }
         }else{
             res.status(401).json({'message':'Unauthorized'});
         }
-    }else{
-        res.status(401).json({'message':'Unauthorized'});
     }
 });
 
