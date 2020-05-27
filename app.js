@@ -13,6 +13,7 @@ require('./database/db.js')
 const postsRoute = require('./routes/posts')
 const authRoute = require('./routes/auth')
 const userRoute = require('./routes/user')
+const discordRoute = require('./routes/dc')
 
 //Middlewares
 app.use(bodyParser.json())
@@ -23,6 +24,7 @@ app.use(morgan('[AUTO-LOG] :remote-addr - :remote-user [:date[web]]: ":method :u
 app.use('/posts', authRoute, postsRoute)
 app.use('/user', userRoute)
 app.use('/auth', authRoute)
+app.use('/discord', discordRoute)
 
 app.get('/wakeup', (req,res) => {
     res.send("Ébren!")
