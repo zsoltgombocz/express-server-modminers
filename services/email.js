@@ -51,15 +51,27 @@ async function send(to, template, payload = null) {
         
     });
 
-    email.send({
+    try {
+        await email.send({
+            template: template,
+            message: {
+                to: to
+            },
+            locals: payload
+            });
+      } catch (error) {
+        throw new Error(error.message);
+      }
+
+    /*email.send({
     template: template,
     message: {
         to: to
     },
     locals: payload
     })
-    .then(console.log("Email elküldve!"))
-    .catch(console.error);
+    .then((val) => { console.log(val) })
+    .catch((err) => { return Promise.reject(new Error(err.message)); });*/
 }
 
 module.exports.send = send;

@@ -42,7 +42,7 @@ router.post('/register', async (req,res) => {
                 'email.email': req.body.email,
                 'email.ver_code': email_key,
                 description: req.body.description,
-                password: hashedpass
+                'password.password': hashedpass
             });
             try{
                 await user.save();
@@ -69,7 +69,7 @@ router.post('/login', async (req,res) => {
         const loginUser = await userModel.findOne({username:req.body.username});
         if(!loginUser)  msg["username"] =  "A felhasználónév nem létezik!"; //return res.json({message: "A felhasználónév nem létezik!"});
 
-        const validPassword = await bcrypt.compare(req.body.password, loginUser.password);
+        const validPassword = await bcrypt.compare(req.body.password, loginUser.password.password);
         
         if(!validPassword) msg["password"] =  "Nem megfelelő név/jelszó párosítás!"; //return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
 
@@ -102,11 +102,13 @@ router.post('/sendemail', async (req, res) => {
          return res.status(400).send(msg)
     }else{
         const usernameExist = await userModel.findOne({username: req.body.username, 'email.email': req.body.email})
-        if(!usernameExist) msg["email"] = "A felhasználónév / e-mail párosítás nem megfelelő!"; //return res.status(400).json({message: "A felhasználónév foglalt!"})
+        if(!usernameExist) msg["username"] = "A felhasználónév / e-mail párosítás nem megfelelő!"; //return res.status(400).json({message: "A felhasználónév foglalt!"})
 
         const validemail = emailValidation(req.body.email)
         if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
         
+        const emailVerified = await userModel.findOne({'email.verified': true, 'email.ver_code': ''})
+        if(!emailVerified) msg["email"] = "Az e-mail cím nincs megerősítve!";
 
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba az email küldés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
@@ -120,7 +122,7 @@ router.post('/sendemail', async (req, res) => {
                 await email.send(req.body.email, req.body.template, {username: req.body.username, verify: {root: process.env.ROOT, email: req.body.email, key: h_code}})
                 res.status(200).json({message: "E-mail elküldve!"})
             }catch(err) {
-                res.status(500).json({message: "Hiba történt az email küldés során!", error: err});
+                res.status(500).json({message: "Hiba történt az email küldés során!", error: err.message});
             }
         }
     }
@@ -153,6 +155,45 @@ router.post('/verifyEmail', async (req, res) => {
     }
 });
 
+router.post('/sendNewPassword', async (req, res) => {
+
+    const {error} = sendEmailValidation(req.body);
+    let msg = {};
+    if(error){
+        error.details.forEach(e => {
+            msg[e.path] = e.message;
+        });
+         console.log('[LOG] Hiba az email küldés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
+         return res.status(400).send(msg)
+    }else{
+        const usernameExist = await userModel.findOne({username: req.body.username, 'email.email': req.body.email})
+        if(!usernameExist) msg["username"] = "A felhasználónév / e-mail párosítás nem megfelelő!"; //return res.status(400).json({message: "A felhasználónév foglalt!"})
+
+        const validemail = emailValidation(req.body.email)
+        if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
+        
+        const emailVerified = await userModel.findOne({'email.verified': true, 'email.ver_code': ''})
+        if(!emailVerified) msg["email"] = "Az e-mail cím nincs megerősítve!";
+
+        if(Object.keys(msg).length != 0) {
+            console.log('[LOG] Hiba az email küldés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
+            return res.status(400).json(msg);
+        }else{
+            let h_code = undefined;
+            if(req.body.h_key === "true") {
+                h_code = await authroute.createKey();
+            }
+            try{
+                await email.send(req.body.email, req.body.template, {username: req.body.username, verify: {root: process.env.ROOT, email: req.body.email, key: h_code}})
+                await usernameExist.updateOne({'password.password_code': h_code, 'password.request': true})
+                res.status(200).json({message: "E-mail elküldve!"})
+            }catch(err) {
+                res.status(500).json({message: "Hiba történt az email küldés során!", error: err.message});
+            }
+        }
+    }
+});
+//VALID TRUE, FRONTEND 2 JELSZÓ MEZŐ KELL, MEG NÉV + EMAIL OLDAL ERROR MESSAGEKKEL
 router.post('/newPassword', async (req, res) => {
     if(!req.query.username || !req.query.email || !req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés!'})
 
@@ -165,7 +206,7 @@ router.post('/newPassword', async (req, res) => {
         const user = await userModel.findOne(payload);
         if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Ehhez a fiókhoz nem kértek új jelszót!'});
 
-        if(user.password_code != req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező kulcs!'});
+        if(user.password.password_code != req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező kulcs!'});
 
         const validKey = await authroute.validateKey(req.query.key);
 

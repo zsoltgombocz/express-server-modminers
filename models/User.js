@@ -8,14 +8,14 @@ const UserSchema = mongoose.Schema({
         maxlength: 64
     },
     password: {
-        request: {type: Boolean, require: true, default: false},
-        type: String,
-        require: true,
-        minlength: 6,
-        maxlength: 255
-    },
-    password_code: {
-        type: String, default: ""
+        password: {
+            type: String,
+            require: true,
+            minlength: 11,
+            maxlength: 64
+        },
+        request: {type: Boolean, default: false},
+        password_code: {type: String, default: ""},
     },
     email: {
         email: {

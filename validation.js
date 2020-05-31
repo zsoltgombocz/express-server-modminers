@@ -42,6 +42,7 @@ const sendEmailValidation = data => {
     return schema.validate(data, {abortEarly: false});
 }
 
+
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.emailValidation = emailValidation;
