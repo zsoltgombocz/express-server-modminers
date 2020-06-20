@@ -55,14 +55,14 @@ router.get('/create', async (req, res) => {
     }
 });
 
-async function validateKey(key){
+async function validateKey(key, del=true){
     let get;
     try {
         get = await Keys_Model.find();
         for (i = 0; i<get.length; i++) {
             const match = await bcrypt.compare(key, get[i].key)
             if(match) {
-                if(get[i].permanent === false) {
+                if(get[i].permanent === false && del === true) {
                     try{
                         await Keys_Model.deleteOne({key: get[i].key});
                         return true;

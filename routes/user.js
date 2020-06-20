@@ -208,7 +208,7 @@ router.post('/newPassword', async (req, res) => {
 
         if(user.password.password_code != req.query.key) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező kulcs!'});
 
-        const validKey = await authroute.validateKey(req.query.key);
+        const validKey = await authroute.validateKey(req.query.key, false);
 
         if(validKey) {
             return res.status(200).json({valid: true});
