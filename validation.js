@@ -13,7 +13,8 @@ const registerValidation = data => {
         username: joi.string().min(6).required().messages(message),
         email: joi.string().min(6).required().email().messages(message),
         description: joi.string().min(20).required().messages(message),
-        password: joi.string().min(6).required().messages(message)
+        password: joi.string().min(6).required().messages(message),
+        sex: joi.number().required().messages(message)
     });
     return schema.validate(data, {abortEarly: false});
 }
@@ -42,8 +43,17 @@ const sendEmailValidation = data => {
     return schema.validate(data, {abortEarly: false});
 }
 
+const savePasswordvalidation = data => {
+    const schema = joi.object().keys({
+        password: joi.string().min(6).required().messages(message),
+        key: joi.string().min(3).required().messages(message)
+    });
+    return schema.validate(data, {abortEarly: false});
+} 
+
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.emailValidation = emailValidation;
 module.exports.sendEmailValidation = sendEmailValidation;
+module.exports.savePasswordvalidation = savePasswordvalidation;

@@ -33,6 +33,11 @@ const UserSchema = mongoose.Schema({
         minlength: 20,
         maxlength: 5000
     },
+    sex: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     permissions: {
         verified: {type: Boolean, default: false, require:true},
         admin: {type: Boolean, default: false, require:true},

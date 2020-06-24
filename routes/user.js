@@ -4,7 +4,7 @@ const userModel = require('../models/User')
 const bcrypt = require('bcrypt')
 const authroute = require('../routes/auth')
 const email = require('../services/email')
-const {loginValidation, registerValidation, emailValidation, sendEmailValidation} = require('../validation')
+const {loginValidation, registerValidation, emailValidation, sendEmailValidation, savePasswordvalidation} = require('../validation')
 
 router.use('/sendemail', authroute)
 
@@ -217,6 +217,46 @@ router.post('/newPassword', async (req, res) => {
         }
     } catch (error) {
         return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
+    }
+});
+
+router.post('/savePassword', async (req, res) => {
+
+    const {error} = savePasswordvalidation(req.body);
+    let msg = {};
+    if(error){
+        error.details.forEach(e => {
+            msg[e.path] = e.message;
+        });
+         console.log('[LOG] Hiba a jelszó mentés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
+         return res.status(400).send(msg)
+    }else{
+        const payload = {
+            'password.password_code': req.body.key,
+            'password.request': true
+        }
+        try {
+            const user = await userModel.findOne(payload);
+            if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Ehhez a fiókhoz nem kértek új jelszót!'});
+
+            if(user.password.password_code != req.body.key) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező kulcs!'});
+
+            const validKey = await authroute.validateKey(req.body.key, true);
+
+            if(validKey) {
+                const hashedpass = await bcrypt.hash(req.body.password, 10);
+
+                const updated = await userModel.updateOne(
+                    payload, 
+                    {$set: {'password.password': hashedpass, 'password.password_code': '', 'password.request': false}}
+                );
+                res.json({success: true})
+            }else{
+                return res.status(400).json({message: 'Nem megfelelő kérés! A megadott kulcs helytelen!'});
+            }
+        } catch (error) {
+            return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
+        }
     }
 });
 
