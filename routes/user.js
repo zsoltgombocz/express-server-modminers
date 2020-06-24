@@ -85,7 +85,7 @@ router.post('/login', async (req,res) => {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."}))
                 return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."})
             }
-            return res.json({message: "Sikeres belépés", user: {token:"Kéne"}})
+            return res.json({success: true, message: "Sikeres belépés", user: {token:"Kéne"}})
         }
     }
 })
