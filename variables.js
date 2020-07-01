@@ -5,6 +5,7 @@ const variables = {
     'OAuth_C_ID': process.env.OAuth_C_ID,
     'OAuth_C_S': process.env.OAuth_C_S,
     'R_TOKEN': process.env.R_TOKEN,
+    'TOKEN_SECRET': process.env.TOKEN_SECRET
 }
 
 const keys = Object.keys(variables);

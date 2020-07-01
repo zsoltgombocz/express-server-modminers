@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt')
 const authroute = require('../routes/auth')
 const email = require('../services/email')
 const {loginValidation, registerValidation, emailValidation, sendEmailValidation, savePasswordvalidation} = require('../validation')
+const jwt = require('jsonwebtoken')
 
 router.use('/sendemail', authroute)
 
@@ -87,7 +88,10 @@ router.post('/login', async (req,res) => {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."}))
                 return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."})
             }
-            return res.json({success: true, message: "Sikeres belépés", user: {token:"Kéne"}})
+
+            const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
+
+            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username}})
         }
     }
 })
@@ -109,8 +113,8 @@ router.post('/sendemail', async (req, res) => {
         const validemail = emailValidation(req.body.email)
         if(!validemail) msg["validemail"] = "Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"; //return res.status(400).json({message:"Csak 'gmail.com' kiterjesztésű emailt fogadunk el!"})
         
-        const emailVerified = await userModel.findOne({'email.verified': true, 'email.ver_code': ''})
-        if(!emailVerified) msg["email"] = "Az e-mail cím nincs megerősítve!";
+       /* const emailVerified = await userModel.findOne({'email.verified': true, 'email.ver_code': ''})
+        if(!emailVerified) msg["email"] = "Az e-mail cím nincs megerősítve!";*/
 
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba az email küldés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))

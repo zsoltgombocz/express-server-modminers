@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const Keys_Model = require('../models/Keys');
 const rstring = require('randomstring');
+const jwt = require('jsonwebtoken')
 
 router.get('/', async (req, res, next) => {
 
@@ -40,6 +41,20 @@ router.post('/', async (req, res, next) => {
         }
     }
 });
+
+router.post('/verifyToken', async (req, res) => {
+
+    const token = req.body['token'];
+    if(token == null) return res.status(400).send("Nem megfelelő kérés!")
+    try {
+        data = jwt.verify(token, process.env.TOKEN_SECRET)
+        
+        res.status(200).send(data)
+    }catch(err) {
+        res.status(400).send("Nem megfelelő token!")
+    }
+
+})
 
 router.get('/create', async (req, res) => {
     if(req.headers.host === 'modminers.hu' || req.headers.host === 'localhost:8080' || req.headers.host === 'localhost:3000') {

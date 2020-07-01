@@ -51,9 +51,23 @@ const savePasswordvalidation = data => {
     return schema.validate(data, {abortEarly: false});
 } 
 
+const SubmitSkillValidation = data => {
+    const schema = joi.object().keys({
+        r_name: joi.string().required().messages(message),
+        d_name: joi.string().required().messages(message),
+        price: joi.number().required().messages(message),
+        desc: joi.string().required().messages(message),
+        required: joi.string().messages(message).allow("", null),
+        group: joi.string().required().messages(message)
+
+    });
+    return schema.validate(data, {abortEarly: false});
+}
+
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
 module.exports.emailValidation = emailValidation;
 module.exports.sendEmailValidation = sendEmailValidation;
 module.exports.savePasswordvalidation = savePasswordvalidation;
+module.exports.SubmitSkillValidation = SubmitSkillValidation;

@@ -23,6 +23,7 @@
     "express": "^4.17.1",
     "googleapis": "^49.0.0",
     "heroku": "^7.39.5",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.5",
     "morgan": "^1.10.0",
     "nodemailer": "^6.4.6",

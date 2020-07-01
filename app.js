@@ -14,6 +14,7 @@ const postsRoute = require('./routes/posts')
 const authRoute = require('./routes/auth')
 const userRoute = require('./routes/user')
 const discordRoute = require('./routes/dc')
+const skillsRoute = require('./routes/skills')
 
 //Middlewares
 app.use(bodyParser.json())
@@ -25,6 +26,7 @@ app.use('/posts', authRoute, postsRoute)
 app.use('/user', userRoute)
 app.use('/auth', authRoute)
 app.use('/discord', discordRoute)
+app.use('/skills', skillsRoute)
 
 app.get('/wakeup', (req,res) => {
     res.send("Ébren!")
