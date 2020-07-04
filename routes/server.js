@@ -5,12 +5,12 @@ const rstring = require('randomstring');
 const jwt = require('jsonwebtoken')
 
 router.post('/rang', async (req, res) => {
-    if(isServer) {
+    if(!isServer(req.headers.host)) {
         if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
             const user = await User.findOne({username: req.body.username})
 
-            return res.status(200).send(user.permissions.server)
+            return res.send("" + user.permissions.server)
         } catch (error) {
             return res.status(500).json({error:error})
         }
@@ -20,8 +20,8 @@ router.post('/rang', async (req, res) => {
 });
 
 function isServer(ip) {
-    if(ip === process.env.SERVER_ip) return true
-    else return false
+    if(ip === process.env.SERVER_ip){return true}
+    else {return false}
 }
 
 
