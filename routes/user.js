@@ -272,10 +272,21 @@ router.get('/getUser/:id', async (req, res) => {
     if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
 
     try {
-        const user = await userModel.findOne({_id: req.params.id});
-        if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező fiók!'});
+        if(res.locals.data._id == req.params.id) {
+            const user = await userModel.findOne({_id: req.params.id});
+            if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező fiók!'});
+    
+            res.status(200).json(user)
+        }else{
+            if(res.locals.data.admin === true) {
+                const user = await userModel.findOne({_id: req.params.id});
+                if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező fiók!'});
 
-        res.status(200).json(user)
+                res.status(200).json(user)
+            }else{
+                res.status(400).json({message: "Nem engedélyezett művelet!"})
+            }
+        }
 
     } catch (error) {
         return res.status(500).json({message: 'Váratlan hiba történt!', error: error});

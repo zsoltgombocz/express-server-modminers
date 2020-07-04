@@ -7,10 +7,10 @@ const jwt = require('jsonwebtoken')
 router.post('/', async (req, res, next) => {
 
     const token = req.headers['auth']
-    if(token == null) res.status(401).json({'message':'Unauthorized'});
+    if(token == null) return res.status(401).json({'message':'Unauthorized'});
     try {
         data = jwt.verify(token, process.env.TOKEN_SECRET)
-        
+        res.locals.data = data
         next();
     }catch(err) {
         res.status(401).json({'message':'Unauthorized'});
@@ -39,6 +39,8 @@ router.get('/', async (req, res, next) => {
     if(token == null) return res.status(401).json({'message':'Unauthorized'});
     try {
         data = jwt.verify(token, process.env.TOKEN_SECRET)
+        res.locals.data = data
+        console.log("auth" + res.locals.data)
         next();
     }catch(err) {
         res.status(401).json({'message':'Unauthorized'});
