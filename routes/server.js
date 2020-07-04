@@ -8,7 +8,7 @@ router.post('/rang', async (req, res) => {
     if(isServer) {
         if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
-            const user = User.findOne({username: req.body.username})
+            const user = await User.findOne({username: req.body.username})
 
             return res.status(200).send(user.permissions.server)
         } catch (error) {
