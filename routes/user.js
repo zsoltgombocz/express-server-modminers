@@ -8,6 +8,7 @@ const {loginValidation, registerValidation, emailValidation, sendEmailValidation
 const jwt = require('jsonwebtoken')
 
 router.use('/sendemail', authroute)
+router.use('/getUser/:id', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -91,7 +92,7 @@ router.post('/login', async (req,res) => {
 
             const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
 
-            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username}})
+            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, skinid: loginUser.skinid, sex: loginUser.sex, s_rang: loginUser.permissions.server}})
         }
     }
 })
@@ -263,6 +264,21 @@ router.post('/savePassword', async (req, res) => {
         } catch (error) {
             return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
         }
+    }
+});
+
+router.get('/getUser/:id', async (req, res) => {
+
+    if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
+
+    try {
+        const user = await userModel.findOne({_id: req.params.id});
+        if(user === null) return res.status(400).json({message: 'Nem megfelelő kérés! Nem létező fiók!'});
+
+        res.status(200).json(user)
+
+    } catch (error) {
+        return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
     }
 });
 
