@@ -5,6 +5,7 @@ const rstring = require('randomstring');
 const jwt = require('jsonwebtoken')
 
 router.post('/rang', async (req, res) => {
+    console.log(req.headers.host)
     if(isServer(req.headers.host)) {
         if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
