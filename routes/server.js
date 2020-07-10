@@ -5,8 +5,7 @@ const rstring = require('randomstring');
 const jwt = require('jsonwebtoken')
 
 router.post('/rang', async (req, res) => {
-    console.log(req.headers.host)
-    if(isServer(req.headers.host)) {
+    if(isServer(req.ip)) {
         if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
             const user = await User.findOne({username: req.body.username})
@@ -21,7 +20,7 @@ router.post('/rang', async (req, res) => {
 });
 
 router.post('/ban/:name', async(req, res) => {
-    if(isServer(req.headers.host)) {
+    if(isServer(req.ip)) {
         if(!req.params.name) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
             const user = await User.updateOne({ username: req.params.name }, {'permissions.server': -1, logout: true, 'permissions.admin': false})
