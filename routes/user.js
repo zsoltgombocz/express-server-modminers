@@ -8,7 +8,8 @@ const {loginValidation, registerValidation, emailValidation, sendEmailValidation
 const jwt = require('jsonwebtoken')
 
 router.use('/sendemail', authroute)
-router.use('/getUser/:id', authroute)
+router.use('/getdata/:id', authroute)
+router.use('/update/:id', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -92,7 +93,7 @@ router.post('/login', async (req,res) => {
 
             const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
 
-            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, skinid: loginUser.skinid, sex: loginUser.sex, s_rang: loginUser.permissions.server}})
+            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, skinid: loginUser.skinid, sex: loginUser.sex, s_rang: loginUser.permissions.server, email: loginUser.email.email}})
         }
     }
 })
@@ -267,7 +268,7 @@ router.post('/savePassword', async (req, res) => {
     }
 });
 
-router.get('/getUser/:id', async (req, res) => {
+router.get('/getdata/:id', async (req, res) => {
 
     if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
 
@@ -289,8 +290,41 @@ router.get('/getUser/:id', async (req, res) => {
         }
 
     } catch (error) {
-        return res.status(500).json({message: 'Váratlan hiba történt!', error: error});
+        return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
     }
 });
+
+router.patch('/update/:id', async (req, res) => {
+    console.log(req.params.id)
+
+    if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
+
+    if(res.locals.data){
+
+        if(res.locals.data._id == req.params.id) {
+            try {
+                const user = await userModel.updateOne({ _id: req.params.id }, req.body)
+        
+                res.sendStatus(200)
+            } catch (error) {
+                return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+            }
+        }else{
+            if(res.lcaols.data.admin === true){
+                try {
+                    const user = await userModel.updateOne({ _id: req.params.id }, {username: "asd"})
+            
+                    res.status(200).sendStatus(200)
+                } catch (error) {
+                    return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+                }
+            }else{
+                return res.status(401).json({'message':'Unauthorized'});
+            }
+        }
+    }
+});
+
+
 
 module.exports = router

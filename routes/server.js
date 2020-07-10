@@ -19,6 +19,21 @@ router.post('/rang', async (req, res) => {
     }
 });
 
+router.post('/ban/:name', async(req, res) => {
+    if(!isServer(req.headers.host)) {
+        if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
+        try {
+            const user = await userModel.updateOne({ username: req.params.name }, {'permissions.server': -1, logout: true, admin: false})
+        
+            res.sendStatus(200)
+        } catch (error) {
+            return res.status(500).json({error:error})
+        }
+    }else{
+        res.send("nem szerver")
+    }
+})
+
 function isServer(ip) {
     if(ip === process.env.SERVER_ip){return true}
     else {return false}

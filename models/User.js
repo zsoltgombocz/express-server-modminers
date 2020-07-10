@@ -52,6 +52,10 @@ const UserSchema = mongoose.Schema({
         type: Date,
         default: Date.now(),
         require: true
+    },
+    logout: {
+        type: Boolean,
+        require: false
     }
 
 }, { retainKeyOrder: true });

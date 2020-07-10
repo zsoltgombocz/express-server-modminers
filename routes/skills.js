@@ -36,7 +36,7 @@ router.post('/', async (req,res) => {
                 d_name: req.body.d_name,
                 price: req.body.price,
                 desc: req.body.desc,
-                requried: req.body.requried,
+                req: req.body.req,
                 group: req.body.group,
             });
             try{

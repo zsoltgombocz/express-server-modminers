@@ -17,9 +17,9 @@ const SkillSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    required: {
+    req: {
         type: String,
-        default: ""
+        required: true
     },
     group: {
         type: String,

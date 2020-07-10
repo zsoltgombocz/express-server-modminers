@@ -13,7 +13,7 @@ router.post('/', async (req, res, next) => {
         res.locals.data = data
         next();
     }catch(err) {
-        res.status(401).json({'message':'Unauthorized'});
+        res.status(401).json({'message':'Error', error: err.message});
     }
 
     const key = req.headers['authorization'];
@@ -36,14 +36,44 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
 
     const token = req.headers['auth']
-    if(token == null) return res.status(401).json({'message':'Unauthorized'});
+ 
+    if(token === null) return res.status(401).json({'message':'Unauthorized'});
     try {
         data = jwt.verify(token, process.env.TOKEN_SECRET)
         res.locals.data = data
-        console.log("auth" + res.locals.data)
         next();
     }catch(err) {
-        res.status(401).json({'message':'Unauthorized'});
+        res.status(401).json({'message':'Error', error: err.message});
+    }
+
+    const key = req.headers['authorization'];
+
+    /*if(req.headers.host === 'modminers.hu' || req.headers.host === 'localhost:8080' || req.headers.host === 'localhost:3000') {
+        next();
+    }else{
+        if(key != undefined) {
+            if(await validateKey(key)) {
+                next();
+            }else{
+                res.status(401).json({'message':'Unauthorized'});
+            }
+        }else{
+            res.status(401).json({'message':'Unauthorized'});
+        }
+    }*/
+});
+
+router.patch('/', async (req, res, next) => {
+
+    const token = req.headers['auth']
+
+    if(token === null) return res.status(401).json({'message':'Unauthorized'});
+    try {
+        data = jwt.verify(token, process.env.TOKEN_SECRET)
+        res.locals.data = data
+        next();
+    }catch(err) {
+        res.status(401).json({'message':'Error', error: err.message});
     }
 
     const key = req.headers['authorization'];

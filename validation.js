@@ -57,7 +57,7 @@ const SubmitSkillValidation = data => {
         d_name: joi.string().required().messages(message),
         price: joi.number().required().messages(message),
         desc: joi.string().required().messages(message),
-        required: joi.string().messages(message).allow("", null),
+        req: joi.string().required().messages(message),
         group: joi.string().required().messages(message)
 
     });
