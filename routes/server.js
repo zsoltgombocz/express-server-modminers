@@ -5,10 +5,7 @@ const rstring = require('randomstring');
 const jwt = require('jsonwebtoken')
 
 router.post('/rang', async (req, res) => {
-    console.log(req.connection.remoteAddress + "\n")
-    console.log(req.headers['x-forwarded-for'] + "\n")
-    console.log(req.ip + "\n")
-    if(isServer(req.ip)) {
+    if(isServer(req.headers['x-forwarded-for'])) {
         if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
             const user = await User.findOne({username: req.body.username})
@@ -18,12 +15,12 @@ router.post('/rang', async (req, res) => {
             return res.status(500).json({error:error})
         }
     }else{
-        res.send("nem szerver" + req.connection.remoteAddress)
+        res.sendStatus(400)
     }
 });
 
 router.post('/ban/:name', async(req, res) => {
-    if(isServer(req.ip)) {
+    if(isServer(req.headers['x-forwarded-for'])) {
         if(!req.params.name) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {
             const user = await User.updateOne({ username: req.params.name }, {'permissions.server': -1, logout: true, 'permissions.admin': false})
