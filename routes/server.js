@@ -5,7 +5,9 @@ const rstring = require('randomstring');
 const jwt = require('jsonwebtoken')
 
 router.post('/rang', async (req, res) => {
-    console.log(req.connection.remoteAddress)
+    console.log(req.connection.remoteAddress + "\n")
+    console.log(request.headers['x-forwarded-for'] + "\n")
+    console.log(req.ip + "\n")
     if(isServer(req.ip)) {
         if(!req.body.username) return res.status(400).json({message: "Nincs mező kitöltve!"})
         try {

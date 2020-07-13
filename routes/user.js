@@ -304,15 +304,19 @@ router.patch('/update/:id', async (req, res) => {
         if(res.locals.data._id == req.params.id) {
             try {
                 const user = await userModel.updateOne({ _id: req.params.id }, req.body)
+
+                console.log("UPDATE BODY:" + req.body)
         
                 res.sendStatus(200)
             } catch (error) {
                 return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
             }
         }else{
-            if(res.lcaols.data.admin === true){
+            if(res.locals.data.admin === true){
                 try {
-                    const user = await userModel.updateOne({ _id: req.params.id }, {username: "asd"})
+                    const user = await userModel.updateOne({ _id: req.params.id }, req.body)
+
+                    console.log("UPDATE BODY:" + req.body)
             
                     res.status(200).sendStatus(200)
                 } catch (error) {
