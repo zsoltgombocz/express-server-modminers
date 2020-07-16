@@ -34,6 +34,23 @@ router.post('/ban/:name', async(req, res) => {
     }
 })
 
+router.get('/skin/:name', async (req, res) => {
+
+    if(isServer(req.headers['x-forwarded-for'])) {
+        if(!req.params.name) return res.status(400).json({message: "Nincs mező kitöltve!"})
+        try {
+            const user = await User.findOne({ username: req.params.name })
+        
+            res.status(200).json({sex: user.sex, skinid: user.skin})
+        } catch (error) {
+            return res.status(500).json({error:error.message})
+        }
+    }else{
+        res.sendStatus(400)
+    }
+
+});
+
 function isServer(ip) {
     if(ip === process.env.SERVER_IP){return true}
     else {return false}

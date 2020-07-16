@@ -14,7 +14,8 @@ const registerValidation = data => {
         email: joi.string().min(6).required().email().messages(message),
         description: joi.string().min(20).required().messages(message),
         password: joi.string().min(6).required().messages(message),
-        sex: joi.number().required().messages(message)
+        sex: joi.number().required().messages(message),
+        skin: joi.number().required().messages(message)
     });
     return schema.validate(data, {abortEarly: false});
 }

@@ -38,6 +38,11 @@ const UserSchema = mongoose.Schema({
         required: true,
         default: 0
     },
+    skin: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     permissions: {
         verified: {type: Boolean, default: false, require:true},
         admin: {type: Boolean, default: false, require:true},
