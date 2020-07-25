@@ -65,6 +65,14 @@ const SubmitSkillValidation = data => {
     return schema.validate(data, {abortEarly: false});
 }
 
+const SubmitSkinValidation = data => {
+    const schema = joi.object().keys({
+        sex: joi.number().required().messages(message),
+        id: joi.number().required().messages(message)
+    });
+    return schema.validate(data, {abortEarly: false});
+}
+
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
@@ -72,3 +80,4 @@ module.exports.emailValidation = emailValidation;
 module.exports.sendEmailValidation = sendEmailValidation;
 module.exports.savePasswordvalidation = savePasswordvalidation;
 module.exports.SubmitSkillValidation = SubmitSkillValidation;
+module.exports.SubmitSkinValidation = SubmitSkinValidation;
