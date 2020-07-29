@@ -10,11 +10,16 @@ try {
         process.env.OAuth_C_S,
         "https://developers.google.com/oauthplayground" // Redirect URL
     );
-    
     oauth2Client.setCredentials({
         refresh_token: process.env.R_TOKEN
     });
     accessToken = oauth2Client.getAccessToken()
+    .then(res => console.log(res))
+    .catch(err => {
+        console.log("[Hiba]: Nem sikerült elérni az OAuth2 szervereit! Error: " + err.message)
+        process.exit(0);    
+    })
+
 } catch (error) {
     console.log(error)
 }
