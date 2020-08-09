@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken')
 router.use('/sendemail', authroute)
 router.use('/getdata/:id', authroute)
 router.use('/update/:id', authroute)
+router.use('/getall', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -289,6 +290,22 @@ router.get('/getdata/:id', async (req, res) => {
             }
         }
 
+    } catch (error) {
+        return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+    }
+});
+
+router.get('/getall', async (req, res) => {
+
+    try {
+        if(res.locals.data.admin === true) {
+            const users = await userModel.find()
+            .select('-password.password')
+
+            res.status(200).json(users)
+        }else{
+            res.status(400).json({message: "Nem engedélyezett művelet!"})
+        }
     } catch (error) {
         return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
     }

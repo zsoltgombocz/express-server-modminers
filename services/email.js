@@ -14,7 +14,7 @@ try {
         refresh_token: process.env.R_TOKEN
     });
     accessToken = oauth2Client.getAccessToken()
-    .then(res => console.log(res))
+    .then(res => {})
     .catch(err => {
         console.log("[Hiba]: Nem sikerült elérni az OAuth2 szervereit! Error: " + err.message)
         process.exit(0);    
