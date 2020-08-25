@@ -87,9 +87,14 @@ router.post('/login', async (req,res) => {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({email_notverified: "Az e-mail cím nincs megerősítve."}))
                 return res.status(400).json({email_notverified: "Az e-mail cím nincs megerősítve."})
             }
-            if(!loginUser.permissions.verified) {
+            if(!loginUser.permissions.verified === 0 ) {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."}))
                 return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."})
+            }
+
+            if(!loginUser.permissions.verified === -1 ) {
+                console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "Regisztrációd elutasításra került adminjaink által!"}))
+                return res.status(400).json({user_notverified: "Regisztrációd elutasításra került adminjaink által!"})
             }
 
             const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
