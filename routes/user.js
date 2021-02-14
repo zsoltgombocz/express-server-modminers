@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken')
 router.use('/sendemail', authroute)
 router.use('/getdata/:id', authroute)
 router.use('/update/:id', authroute)
+router.use('/getall', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -86,14 +87,19 @@ router.post('/login', async (req,res) => {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({email_notverified: "Az e-mail cím nincs megerősítve."}))
                 return res.status(400).json({email_notverified: "Az e-mail cím nincs megerősítve."})
             }
-            if(!loginUser.permissions.verified) {
+            if(!loginUser.permissions.verified === 0 ) {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."}))
                 return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."})
             }
 
+            if(!loginUser.permissions.verified === -1 ) {
+                console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "Regisztrációd elutasításra került adminjaink által!"}))
+                return res.status(400).json({user_notverified: "Regisztrációd elutasításra került adminjaink által!"})
+            }
+
             const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
 
-            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, skinid: loginUser.skinid, sex: loginUser.sex, s_rang: loginUser.permissions.server, email: loginUser.email.email}})
+            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, sex: loginUser.sex, s_rang: loginUser.permissions.server, email: loginUser.email.email, skin: loginUser.skin}})
         }
     }
 })
@@ -294,6 +300,22 @@ router.get('/getdata/:id', async (req, res) => {
     }
 });
 
+router.get('/getall', async (req, res) => {
+
+    try {
+        if(res.locals.data.admin === true) {
+            const users = await userModel.find()
+            .select('-password.password')
+
+            res.status(200).json(users)
+        }else{
+            res.status(400).json({message: "Nem engedélyezett művelet!"})
+        }
+    } catch (error) {
+        return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+    }
+});
+
 router.patch('/update/:id', async (req, res) => {
     console.log(req.params.id)
 
@@ -304,8 +326,6 @@ router.patch('/update/:id', async (req, res) => {
         if(res.locals.data._id == req.params.id) {
             try {
                 const user = await userModel.updateOne({ _id: req.params.id }, req.body)
-
-                console.log("UPDATE BODY:" + req.body)
         
                 res.sendStatus(200)
             } catch (error) {
@@ -315,17 +335,30 @@ router.patch('/update/:id', async (req, res) => {
             if(res.locals.data.admin === true){
                 try {
                     const user = await userModel.updateOne({ _id: req.params.id }, req.body)
-
-                    console.log("UPDATE BODY:" + req.body)
             
                     res.status(200).sendStatus(200)
                 } catch (error) {
                     return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
                 }
             }else{
-                return res.status(401).json({'message':'Unauthorized'});
+                return res.status(401).json({message:'Nem engedélyezett művelet!'});
             }
         }
+    }
+});
+
+router.get('/getid/:username', async (req, res) => {
+    const host = req.headers['host'];
+    if(host == "www.modminers.hu" || host == "localhost:3000") {
+        try {
+            const users = await userModel.find({username: req.params.username})
+            .select('_id')
+            res.status(200).json(users)
+        } catch (error) {
+            return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+        }
+    }else{
+        return res.sendStatus(401)
     }
 });
 

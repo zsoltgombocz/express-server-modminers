@@ -16,6 +16,9 @@ const userRoute = require('./routes/user')
 const discordRoute = require('./routes/dc')
 const skillsRoute = require('./routes/skills')
 const serverRoute = require('./routes/server')
+const skinRoute = require('./routes/skins')
+const pageRoute = require('./routes/page')
+const logRoute = require('./routes/logs')
 
 //Middlewares
 app.use(bodyParser.json())
@@ -29,6 +32,9 @@ app.use('/auth', authRoute)
 app.use('/discord', discordRoute)
 app.use('/skills', skillsRoute)
 app.use('/server', serverRoute)
+app.use('/skins', skinRoute)
+app.use('/page', authRoute, pageRoute)
+app.use('/log', logRoute)
 
 app.get('/wakeup', (req,res) => {
     res.send("Ébren!")

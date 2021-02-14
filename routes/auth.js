@@ -16,8 +16,6 @@ router.post('/', async (req, res, next) => {
         res.status(401).json({'message':'Error', error: err.message});
     }
 
-    const key = req.headers['authorization'];
-
     /*if(req.headers.host === 'modminers.hu' || req.headers.host === 'localhost:8080' || req.headers.host === 'localhost:3000') {
         next();
     }else{
