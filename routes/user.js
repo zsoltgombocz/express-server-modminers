@@ -347,6 +347,21 @@ router.patch('/update/:id', async (req, res) => {
     }
 });
 
+router.get('/getid/:username', async (req, res) => {
+    const host = req.headers['host'];
+    if(host == "www.modminers.hu" || host == "localhost:3000") {
+        try {
+            const users = await userModel.find({username: req.params.username})
+            .select('_id')
+            res.status(200).json(users)
+        } catch (error) {
+            return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+        }
+    }else{
+        return res.sendStatus(401)
+    }
+});
+
 
 
 module.exports = router
