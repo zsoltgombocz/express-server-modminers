@@ -348,9 +348,9 @@ router.patch('/update/:id', async (req, res) => {
 });
 
 router.get('/getid/:username', async (req, res) => {
-    const host = req.headers['host'];
+    const origin = req.headers['origin'];
     console.log(req.headers)
-    if(host == "api.modminers.hu" || host == "localhost:3000") {
+    if(origin == "modminers.hu" || origin == "localhost:3000" || origin == "www.modminers.hu" || origin == "https://www.modminers.hu") {
         try {
             const users = await userModel.find({username: req.params.username})
             .select('_id')
