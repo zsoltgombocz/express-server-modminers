@@ -349,7 +349,7 @@ router.patch('/update/:id', async (req, res) => {
 
 router.get('/getid/:username', async (req, res) => {
     const host = req.headers['host'];
-    console.log(host)
+    console.log("EZ A HOST:" + host)
     if(host == "www.modminers.hu" || host == "localhost:3000") {
         try {
             const users = await userModel.find({username: req.params.username})
