@@ -348,9 +348,6 @@ router.patch('/update/:id', async (req, res) => {
 });
 
 router.get('/getid/:username', async (req, res) => {
-    const origin = req.headers['origin'];
-    console.log(req.headers)
-    if(origin == "modminers.hu" || origin == process.env.LOCAL_ORIGIN || req.headers['postman'] == 1) {
         try {
             const users = await userModel.find({username: req.params.username})
             .select('_id, username')
@@ -359,9 +356,6 @@ router.get('/getid/:username', async (req, res) => {
         } catch (error) {
             return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
         }
-    }else{
-        return res.sendStatus(401)
-    }
 });
 
 

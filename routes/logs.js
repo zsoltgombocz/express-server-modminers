@@ -10,9 +10,6 @@ router.use('/:id', authroute)
 //SUBMIT
 router.post('/', async (req,res) => {
 
-    const host = req.headers['host'];
-
-    if(host === "www.modminers.hu" || host === "localhost:3000") {
         const {error} = saveLogValidation(req.body);
     
         if(error) {
@@ -31,16 +28,10 @@ router.post('/', async (req,res) => {
         }catch(err){
             res.json({message: err})
         }
-    }else{
-        res.sendStatus(401)
-    }
 });
 //GET SPECIFIC
 router.get('/:id', async (req,res) => {
-
-    const host = req.headers['host'];
-
-    if(host === "www.modminers.hu" || host === "localhost:3000") {
+    
         try {
             console.log(res.locals.data)
             if(req.params.id === "admin" && res.locals.data.admin === true) {
@@ -53,9 +44,6 @@ router.get('/:id', async (req,res) => {
         } catch (err) {
             res.json({message: err.message}) 
         }
-    }else{
-        res.sendStatus(401)
-    }
 });
 /*
 //DELETE
