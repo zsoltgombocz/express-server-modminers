@@ -19,7 +19,7 @@ router.post('/', async (req,res) => {
         const log = new Log({
             user_id: req.body.user_id,
             message: req.body.message,
-            variant: req.body.variant
+            variant: req.body.variant,
         });
     
         try{

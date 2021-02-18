@@ -18,6 +18,11 @@ const LogsSchema = mongoose.Schema({
         type: String,
         require: true,
         default: ""
+    },
+    seen: {
+        type: Boolean,
+        require: true,
+        default: true
     }
 });
 
