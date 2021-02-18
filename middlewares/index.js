@@ -12,7 +12,14 @@ function errorHandler(error, req, res, next) {
     });
 }
 
+function checkOrigin(req,res,next) {
+    const origin = req.headers['origin'];
+    if(origin == process.env.LOCAL_ORIGIN || origin == process.env.LOCAL_ORIGIN || req.headers['postman'] == 1) next()
+    else res.status(401)
+}
+
 module.exports = {
     notFound,
-    errorHandler
+    errorHandler,
+    checkOrigin
 }

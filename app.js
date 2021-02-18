@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-const {notFound, errorHandler} = require('./middlewares')
+const {notFound, errorHandler, checkOrigin} = require('./middlewares')
 const morgan = require('morgan')
 
  
@@ -41,6 +41,7 @@ app.get('/wakeup', (req,res) => {
 })
 
 //ErrorHandler-Middlewares
+app.use(checkOrigin);
 app.use(notFound);
 app.use(errorHandler);
 
