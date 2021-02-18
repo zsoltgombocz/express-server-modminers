@@ -28,8 +28,9 @@ async function send(to, template, payload = null) {
     if(!process.env.GMAIL_ADDR || !process.env.OAuth_C_ID || !process.env.OAuth_C_S || !process.env.R_TOKEN) {
         return console.log("[HIBA] Környezeti változók nincsnek beállítva!")
     }
+    let transporter = null;
     try {
-        const transporter = nodemailer.createTransport({
+        transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 587,
         secure: false,
@@ -41,7 +42,7 @@ async function send(to, template, payload = null) {
             clientSecret: process.env.OAuth_C_S,
             refreshToken: process.env.R_TOKEN,
             accessToken: accessToken
-    },
+        },
         tls: {
             rejectUnauthorized: false
         }
