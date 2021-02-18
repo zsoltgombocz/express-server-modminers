@@ -23,7 +23,7 @@ const logRoute = require('./routes/logs')
 //Middlewares
 app.use(bodyParser.json())
 app.use(cors())
-app.use(morgan('[AUTO-LOG] :remote-addr - :remote-user [:date[web]]: ":method :url HTTP/:http-version" Status: :status :res[content-length] ":referrer" ":user-agent" Header: [:res[header]][:res[header]]"'))
+app.use(morgan('[:date[iso]] ":method :url" Status: :status'))
 
 //Routes
 app.use('/posts', authRoute, postsRoute)
