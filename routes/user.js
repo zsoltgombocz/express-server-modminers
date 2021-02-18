@@ -350,11 +350,7 @@ router.patch('/update/:id', async (req, res) => {
 router.get('/getid/:username', async (req, res) => {
     const origin = req.headers['origin'];
     console.log(req.headers)
-<<<<<<< HEAD
-    if(origin == "modminers.hu" || origin == "localhost:3000" || origin == "www.modminers.hu" || origin == "https://www.modminers.hu") {
-=======
     if(origin == "modminers.hu" || origin == process.env.LOCAL_ORIGIN || req.headers['postman'] == 1) {
->>>>>>> master
         try {
             const users = await userModel.find({username: req.params.username})
             .select('_id, username')
