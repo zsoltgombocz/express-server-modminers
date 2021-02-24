@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const userModel = require('../models/User')
+const logModel = require('../models/Logs')
 const bcrypt = require('bcrypt')
 const authroute = require('../routes/auth')
 const email = require('../services/email')
@@ -11,6 +12,7 @@ router.use('/sendemail', authroute)
 router.use('/getdata/:id', authroute)
 router.use('/update/:id', authroute)
 router.use('/getall', authroute)
+router.use('/delete/:id', authroute)
 
 
 router.post('/register', async (req,res) => {
@@ -317,7 +319,6 @@ router.get('/getall', async (req, res) => {
 });
 
 router.patch('/update/:id', async (req, res) => {
-    console.log(req.params.id)
 
     if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
 
@@ -357,6 +358,25 @@ router.get('/getid/:username', async (req, res) => {
             return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
         }
 });
+
+router.delete('/delete/:id', async (req, res) => {
+
+    if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
+
+    if(res.locals.data){
+        if(res.locals.data.admin === true){
+            try {
+                const deleted = await userModel.deleteOne({_id: req.params.id})
+                return res.status(200).json(deleted)
+            } catch (error) {
+                return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+            }
+        }else{
+           return res.status(401).json({message:'Nem engedélyezett művelet!'});
+        }
+    }
+});
+
 
 
 

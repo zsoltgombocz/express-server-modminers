@@ -10,12 +10,11 @@ const message = {
 
 const registerValidation = data => {
     const schema = joi.object().keys({
-        username: joi.string().min(6).required().messages(message),
+        username: joi.string().min(4).required().messages(message),
         email: joi.string().min(6).required().email().messages(message),
         description: joi.string().min(20).required().messages(message),
         password: joi.string().min(6).required().messages(message),
-        sex: joi.number().required().messages(message),
-        skin: joi.number().required().messages(message)
+        sex: joi.number().required().messages(message)
     });
     return schema.validate(data, {abortEarly: false});
 }
