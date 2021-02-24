@@ -6,6 +6,7 @@ const { saveLogValidation } = require('../validation')
 const authroute = require('../routes/auth')
 
 router.use('/:id', authroute)
+router.use('/delete/userid/:id', authroute)
 
 //SUBMIT
 router.post('/', async (req,res) => {
@@ -33,7 +34,6 @@ router.post('/', async (req,res) => {
 router.get('/:id', async (req,res) => {
     
         try {
-            console.log(res.locals.data)
             if(req.params.id === "admin" && res.locals.data.admin === true) {
                 const admin_logs = await Log.find({user_id: req.params.id})
                 res.json(admin_logs)
@@ -44,6 +44,24 @@ router.get('/:id', async (req,res) => {
         } catch (err) {
             res.json({message: err.message}) 
         }
+});
+//DELETE BY USERID
+router.delete('/delete/userid/:id', async (req, res) => {
+
+    if(req.params.id === null) return res.status(400).json({message: 'Nem megfelelő kérés! Hiányzó mező!'});
+
+    if(res.locals.data){
+        if(res.locals.data.admin === true){
+            try {
+                const deleted = await Log.deleteMany({user_id: req.params.id})
+                return res.status(200).json(deleted)
+            } catch (error) {
+                return res.status(500).json({message: 'Váratlan hiba történt!', error: error.message});
+            }
+        }else{
+           return res.status(401).json({message:'Nem engedélyezett művelet!'});
+        }
+    }else return res.status(401).json({message:'Nem engedélyezett művelet!'});
 });
 /*
 //DELETE
