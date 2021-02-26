@@ -21,7 +21,7 @@ const registerValidation = data => {
 
 const loginValidation = data => {
     const schema = joi.object().keys({
-        username: joi.string().min(6).required().messages(message),
+        username: joi.string().min(4).required().messages(message),
         password: joi.string().min(6).required().messages(message)
     });
     return schema.validate(data, {abortEarly: false});
