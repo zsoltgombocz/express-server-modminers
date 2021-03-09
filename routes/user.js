@@ -48,7 +48,8 @@ router.post('/register', async (req,res) => {
                 'email.email': req.body.email,
                 'email.ver_code': email_key,
                 description: req.body.description,
-                'password.password': hashedpass
+                'password.password': hashedpass,
+                'sex': req.body.sex
             });
             try{
                 await user.save();
@@ -79,6 +80,7 @@ router.post('/login', async (req,res) => {
             const validPassword = await bcrypt.compare(req.body.password, loginUser.password.password);
         
             if(!validPassword) msg["password"] =  "Nem megfelelő név/jelszó párosítás!"; //return res.status(400).json({message: "Nem megfelelő név/jelszó párosítás!"});
+            msg['log_message'] = "Nem megfelelő név/jelszó párosítás!";
         }
 
         if(Object.keys(msg).length != 0) {
@@ -87,16 +89,16 @@ router.post('/login', async (req,res) => {
         }else{
             if(!loginUser.email.verified) {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({email_notverified: "Az e-mail cím nincs megerősítve."}))
-                return res.status(400).json({email_notverified: "Az e-mail cím nincs megerősítve."})
+                return res.status(400).json({email_notverified: "Az e-mail cím nincs megerősítve.", log_message: "Az e-mail cím nincs megerősítve."})
             }
             if(!loginUser.permissions.verified === 0 ) {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."}))
-                return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed."})
+                return res.status(400).json({user_notverified: "A fiók nincs elbírálva. Adminjaink amint tudják elbírálják kérésed.", log_message: "A fiók nincs elbírálva."})
             }
 
             if(!loginUser.permissions.verified === -1 ) {
                 console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify({user_notverified: "Regisztrációd elutasításra került adminjaink által!"}))
-                return res.status(400).json({user_notverified: "Regisztrációd elutasításra került adminjaink által!"})
+                return res.status(400).json({user_notverified: "Regisztrációd elutasításra került adminjaink által!", log_message: "Regisztrációd elutasításra került!"})
             }
 
             const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
