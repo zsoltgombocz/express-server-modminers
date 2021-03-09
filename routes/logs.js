@@ -21,6 +21,7 @@ router.post('/', async (req,res) => {
             user_id: req.body.user_id,
             message: req.body.message,
             variant: req.body.variant,
+            icon: req.body.icon
         });
     
         try{

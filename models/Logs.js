@@ -23,6 +23,11 @@ const LogsSchema = mongoose.Schema({
         type: Boolean,
         require: true,
         default: true
+    },
+    icon: {
+        type: String,
+        require: true,
+        default: ""
     }
 });
 
