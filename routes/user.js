@@ -111,7 +111,7 @@ router.post('/login', async (req,res) => {
 
             const token = jwt.sign({_id:loginUser._id, username: loginUser.username, admin: loginUser.permissions.admin, perm: loginUser.permissions.server}, process.env.TOKEN_SECRET)
 
-            return res.header('auth', token).json({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, sex: loginUser.sex, s_rang: loginUser.permissions.server, email: loginUser.email.email, skin: loginUser.skin}})
+            return res.header('auth', token).json(Object.assign({success: true, message: "Sikeres belépés", token: token, user: {_id: loginUser._id, username: loginUser.username, sex: loginUser.sex, s_rang: loginUser.permissions.server, email: loginUser.email.email, skin: loginUser.skin}}, userData))
         }
     }
 })
