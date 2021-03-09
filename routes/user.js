@@ -76,7 +76,7 @@ router.post('/login', async (req,res) => {
     }else{
         const loginUser = await userModel.findOne({username:req.body.username});
 
-        const userData = {ip: req._remoteAddress, _id: loginUser._id}
+        const userData = {ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress, _id: loginUser._id}
 
         if(!loginUser)  {
             msg["username"] =  "A felhasználónév nem létezik!"; //return res.json({message: "A felhasználónév nem létezik!"});
@@ -90,7 +90,6 @@ router.post('/login', async (req,res) => {
         }
 
         Object.assign(msg, userData)
-        console.log(req.headers['x-forwarded-for'] || req.connection.remoteAddress)
 
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
