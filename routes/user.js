@@ -89,10 +89,9 @@ router.post('/login', async (req,res) => {
             }
         }
 
-        Object.assign(msg, userData)
-
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
+            Object.assign(msg, userData)
             return res.status(400).json(msg)
         }else{
             if(!loginUser.email.verified) {
