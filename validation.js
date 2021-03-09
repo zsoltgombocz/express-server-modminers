@@ -76,7 +76,8 @@ const saveLogValidation = data => {
     const schema = joi.object().keys({
         user_id: joi.string().required().min(1).max(24).message(message),
         message: joi.string().required().min(1).message(message),
-        variant: joi.allow()
+        variant: joi.allow(),
+        icon: joi.allow()
     })
     return schema.validate(data, {abortEarly: false})
 }
