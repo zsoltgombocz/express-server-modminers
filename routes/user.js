@@ -90,6 +90,7 @@ router.post('/login', async (req,res) => {
         }
 
         Object.assign(msg, userData)
+        console.log(req)
 
         if(Object.keys(msg).length != 0) {
             console.log('[LOG] Hiba a belépés során!\n[LOG] Kapott adat:'+JSON.stringify(req.body)+'\n[LOG] Kapott hiba:' + JSON.stringify(msg))
